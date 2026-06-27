@@ -14,10 +14,16 @@
     "chrome-extension",
     "edge-extension",
     "subtitle",
+    "subtitle-translator",
     "translation",
+    "video-translation",
+    "captions",
+    "bilingual-subtitles",
     "indonesian",
+    "bahasa-indonesia",
     "youtube",
     "udemy",
+    "google-translate",
     "manifest-v3"
   ],
   "dependencies": {

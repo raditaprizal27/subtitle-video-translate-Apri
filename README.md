@@ -5,7 +5,11 @@
 <h1 align="center">Apri Video Translate</h1>
 
 <p align="center">
-  A lightweight Chromium extension that translates existing video captions into Indonesian with a clean bilingual overlay.
+  Translate existing video captions into Indonesian with a clean bilingual overlay.
+</p>
+
+<p align="center">
+  <img src="docs/assets/banner.png" alt="Apri Video Translate preview" />
 </p>
 
 <p align="center">
@@ -14,6 +18,19 @@
   <img alt="No API key" src="https://img.shields.io/badge/API%20key-not%20required-facc15" />
   <img alt="Default language" src="https://img.shields.io/badge/Default-Indonesian-e11d48" />
 </p>
+
+<p align="center">
+  <strong>Built for Indonesian learners who watch YouTube, Udemy, MIT OpenCourseWare, course videos, lectures, tutorials, and technical talks.</strong>
+</p>
+
+> If this helps your study workflow, please star the repo. It helps other Indonesian learners discover the project.
+
+## Quick Preview
+
+```text
+Hari ini kita akan membangun layanan autentikasi yang mudah dikembangkan.
+What we're going to build today is a scalable authentication service.
+```
 
 ## Why This Exists
 
@@ -35,6 +52,10 @@ It keeps the experience intentionally simple:
 - Debounced caption detection to avoid excessive translation calls.
 - Simple popup controls for enable/disable, target language, bilingual mode, subtitle position, and cache clearing.
 - No login, no backend server, no API key, and no paid API integration.
+
+## Keywords
+
+Chrome subtitle translator, YouTube subtitle translator, Udemy subtitle translator, Indonesian subtitle translator, bilingual captions, video caption translation, Bahasa Indonesia captions, Manifest V3 extension, free subtitle translation.
 
 ## Important Limitation
 
@@ -100,6 +121,20 @@ The unpacked extension is generated in `build/`, and the zip package is generate
 - Optional import/export for settings and cache.
 - Better caption diagnostics when a site cannot be detected.
 - More polished release screenshots and demo GIFs.
+
+## Make The Project Easier To Discover
+
+Recommended GitHub About:
+
+```text
+Translate existing video captions into Indonesian with a clean bilingual overlay. Works with YouTube, YouTube embeds, Udemy, and generic HTML5 video captions.
+```
+
+Recommended topics:
+
+```text
+chrome-extension, edge-extension, manifest-v3, subtitle-translator, video-translation, youtube, udemy, captions, bilingual-subtitles, indonesian, bahasa-indonesia, google-translate
+```
 
 ## Contributing
 
