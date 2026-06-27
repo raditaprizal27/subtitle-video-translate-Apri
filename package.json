@@ -3,6 +3,14 @@
   "version": "3.1.0",
   "description": "A lightweight Chromium extension that translates existing video captions into Indonesian with a bilingual overlay.",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/raditaprizal27/subtitle-video-translate-Apri.git"
+  },
+  "bugs": {
+    "url": "https://github.com/raditaprizal27/subtitle-video-translate-Apri/issues"
+  },
+  "homepage": "https://github.com/raditaprizal27/subtitle-video-translate-Apri#readme",
   "keywords": [
     "chrome-extension",
     "edge-extension",
