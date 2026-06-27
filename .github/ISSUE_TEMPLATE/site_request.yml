@@ -1,0 +1,33 @@
+name: Site support request
+description: Request support for another video or course website.
+title: "[Site]: "
+labels: ["site-support"]
+body:
+  - type: input
+    id: site
+    attributes:
+      label: Website
+      placeholder: "Coursera, edX, Vimeo, ..."
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: Example video URL
+      placeholder: "https://..."
+  - type: dropdown
+    id: captions
+    attributes:
+      label: Are captions available on the site?
+      options:
+        - "Yes, manual captions"
+        - "Yes, auto captions"
+        - "No"
+        - "Not sure"
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Add screenshots, player details, or anything useful.

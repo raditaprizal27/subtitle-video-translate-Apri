@@ -1,59 +1,48 @@
 {
-    "manifest_version": 3,
-    "name": "Udemy Translate",
-    "description": "Translate tool",
-    "version": "3.0.1",
-    "background": {
-        "service_worker": "background.js",
-        "type": "module"
-    },
-    "action": {
-        "default_popup": "popup.html",
-        "default_icon": {
-            "128": "icon-128.png",
-            "48": "icon-48.png"
-        }
-    },
-    "icons": {
-        "48": "icon-48.png",
-        "128": "icon-128.png"
-    },
-    "devtools_page": "devtools.html",
-    "options_page": "options.html",
-    "permissions": [
-        "storage",
-        "activeTab"
-    ],
-    "host_permissions": [
-        "http://*/*",
-        "https://*/*"
-    ],
-    "content_scripts": [
-        {
-            "matches": [
-                "http://*/*",
-                "https://*/*"
-            ],
-            "js": [
-                "content.js"
-            ],
-            "run_at": "document_end"
-        }
-    ],
-    "web_accessible_resources": [
-        {
-            "resources": [
-                "content.styles.scss",
-                "icon-128.png",
-                "icon-48.png"
-            ],
-            "matches": [
-                "http://*/*",
-                "https://*/*"
-            ]
-        }
-    ],
-    "content_security_policy": {
-        "extension_pages": "script-src 'self'; connect-src 'self' https://*.openai.com https://*.bigmodel.cn https://*.deepseek.com https://* localhost:* http://localhost:*; object-src 'self'"
+  "manifest_version": 3,
+  "name": "Apri Video Translate",
+  "description": "Translate existing video captions into Indonesian with a simple bilingual overlay.",
+  "version": "3.1.0",
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "128": "icon-128.png",
+      "48": "icon-48.png"
     }
+  },
+  "icons": {
+    "48": "icon-48.png",
+    "128": "icon-128.png"
+  },
+  "options_page": "options.html",
+  "permissions": ["storage"],
+  "host_permissions": [
+    "https://translate.googleapis.com/*",
+    "*://*.youtube.com/*",
+    "*://*.youtube-nocookie.com/*",
+    "*://*.udemy.com/*",
+    "http://*/*",
+    "https://*/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content.js"],
+      "run_at": "document_end",
+      "all_frames": true
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["icon-128.png", "icon-48.png"],
+      "matches": ["http://*/*", "https://*/*"]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; connect-src 'self' https://translate.googleapis.com; object-src 'self'"
+  }
 }

@@ -1,78 +1,66 @@
 body {
-  width: 400px;
+  width: 340px;
+  margin: 0;
+  background: #f7f8fb;
 }
 
-.centerText {
-  color: red;
-  display: inline-flex;
-  width: 100%;
-  justify-content: center;
-  text-align: center;
+.popup {
+  padding: 14px;
+  color: #1f2937;
 }
 
-
-.justify-center {
-  display: inline-flex;
-  width: 100%;
-  justify-content: center;
-}
-
-
-
-.header {
-  padding:8px;
+.popupHeader {
   display: flex;
   align-items: center;
-  position: relative;
-  div{
-    display: inline-block;
-  }
-  .brand{
-    padding-left: 8px;
-    font-weight: bolder;
-    color: black;
-    font-size: 14px;
-  }
-  .right{
-    display: inline-flex;
-    align-items: center;
-    height: 100%;
-    position: absolute;
-    right: 10px;
-
-  }
+  gap: 10px;
 }
 
-.content{
-  display: inline-flex;
-  height: 100px;
-  width: 100%;
-  background: radial-gradient(white, rgb(51, 65, 76));
-  justify-content: center;
+.brand {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.subtitle {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.divider {
+  margin: 12px 0;
+}
+
+.row {
+  display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  .switch{
-    width: 100%;
-    text-align: center;
-  }
-
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
 }
 
-.flex{
-  display: inline-flex;
-  padding: {
-    left: 15px;
-    right: 15px;
-  }
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 0;
+}
+
+.label {
+  color: #111827;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.hint {
+  color: #6b7280;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.select {
   width: 100%;
-  span{
-    flex:1
-  }
-  input{
-    flex: 1;
-  }
 }
 
-.CompactPicker{
-  width: 280px !important;
+.clearButton {
+  margin-top: 12px;
 }

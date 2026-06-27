@@ -1,186 +1,199 @@
 import { translateText } from '../../utils/request'
 
-console.log('Background script initialized')
+type SubtitlePosition = 'bottom' | 'top'
 
-const DEFAULT_SETTINGS = {
-  status: false,
-  backgroundColor: 'rgba(0, 0, 0, 0.75)',
-  backgroundOpacity: '0.8',
-  originFontColor: '#ffffff',
-  originFontSize: '16',
-  originFontWeight: 'normal',
-  translatedFontSize: '16',
-  translatedFontColor: '#ffff00',
-  translatedFontWeight: 'normal',
-  domConfigs: [
-    {
-      domain: 'https://www.netflix.com',
-      selector: '.player-timedtext-text-container',
-    },
-    { domain: '', selector: '' },
-  ],
-  prompt:
-    'Translate the following English text into Chinese and separate the translations with @@@',
-  // 新增浮动字幕默认配置
-  subtitlePosition: 'bottom',
-  subtitleWidth: 600,
-  subtitleHeight: 120,
-  isDraggable: true,
-  // 添加模型配置
-  selectedModel: 'openai',
-  openaiConfig: {
-    apiKey: '',
-    baseURL: 'https://api.openai.com/v1',
-    modelName: 'gpt-3.5-turbo',
-  },
-  ollamaConfig: {
-    apiKey: 'ollama',
-    baseURL: 'https://localhost:11435/v1',
-    modelName: 'qwen2:0.5b',
-  },
+interface ExtensionSettings {
+  enabled: boolean
+  targetLanguage: string
+  sourceLanguage: string
+  bilingualMode: boolean
+  subtitlePosition: SubtitlePosition
 }
 
-chrome.runtime.onInstalled.addListener(({ reason, previousVersion }) => {
-  if (reason === 'install') {
-    console.log('First install')
-    chrome.storage.local.set(DEFAULT_SETTINGS)
-  } else if (reason === 'update') {
-    const currentVersion = chrome.runtime.getManifest().version
-    console.log(`Updated from ${previousVersion} to ${currentVersion}`)
+interface TranslateRequest {
+  type: 'TRANSLATE_TEXT'
+  text: string
+  targetLanguage?: string
+  sourceLanguage?: string
+}
+
+const TRANSLATION_CACHE_KEY = 'translationCache'
+
+const DEFAULT_SETTINGS: ExtensionSettings = {
+  enabled: true,
+  targetLanguage: 'id',
+  sourceLanguage: 'auto',
+  bilingualMode: true,
+  subtitlePosition: 'bottom',
+}
+
+const getStorageData = <T>(
+  keys: string[] | Record<string, unknown> | null,
+): Promise<T> =>
+  new Promise((resolve, reject) => {
+    chrome.storage.local.get(keys, (result) => {
+      if (chrome.runtime.lastError) {
+        reject(chrome.runtime.lastError)
+        return
+      }
+
+      resolve(result as T)
+    })
+  })
+
+const setStorageData = (items: Record<string, unknown>): Promise<void> =>
+  new Promise((resolve, reject) => {
+    chrome.storage.local.set(items, () => {
+      if (chrome.runtime.lastError) {
+        reject(chrome.runtime.lastError)
+        return
+      }
+
+      resolve()
+    })
+  })
+
+const buildCacheKey = (
+  text: string,
+  targetLanguage = DEFAULT_SETTINGS.targetLanguage,
+  sourceLanguage = DEFAULT_SETTINGS.sourceLanguage,
+): string => `${sourceLanguage}:${targetLanguage}:${text.trim()}`
+
+const getSettings = async (): Promise<ExtensionSettings> => {
+  const stored = await getStorageData<Partial<ExtensionSettings>>(
+    DEFAULT_SETTINGS as unknown as Record<string, unknown>,
+  )
+
+  return {
+    ...DEFAULT_SETTINGS,
+    ...stored,
   }
+}
+
+const ensureDefaultSettings = async () => {
+  const stored = await getStorageData<Partial<ExtensionSettings>>(null)
+  const updates: Partial<ExtensionSettings> = {}
+
+  Object.entries(DEFAULT_SETTINGS).forEach(([key, value]) => {
+    if (stored[key as keyof ExtensionSettings] === undefined) {
+      ;(updates as Record<string, unknown>)[key] = value
+    }
+  })
+
+  if (Object.keys(updates).length > 0) {
+    await setStorageData(updates as Record<string, unknown>)
+  }
+}
+
+chrome.runtime.onInstalled.addListener(() => {
+  ensureDefaultSettings().catch((error) => {
+    console.error('Failed to initialize default settings:', error)
+  })
 })
 
-const getStorageData = (): Promise<any> =>
-  new Promise((resolve) => chrome.storage.local.get(null, resolve))
-
-const broadcastStatusChange = async (status: boolean): Promise<void> => {
-  try {
-    const tabs = await chrome.tabs.query({})
-    const promises = tabs.map(async (tab) => {
-      if (tab.id) {
-        try {
-          await chrome.tabs.sendMessage(tab.id, {
-            type: 'STATUS_CHANGED',
-            status,
-          })
-        } catch (error) {
-          // 忽略无法连接的标签页（如 chrome:// 页面）
-          console.log(`Could not send message to tab ${tab.id}:`, error)
-        }
-      }
-    })
-    await Promise.allSettled(promises)
-  } catch (error) {
-    console.error('Error in broadcastStatusChange:', error)
-  }
-}
-
-chrome.storage.onChanged.addListener((changes, namespace) => {
-  if (namespace === 'local' && changes.status) {
-    broadcastStatusChange(changes.status.newValue)
-  }
+chrome.runtime.onStartup.addListener(() => {
+  ensureDefaultSettings().catch((error) => {
+    console.error('Failed to initialize default settings:', error)
+  })
 })
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.type === 'TRANSLATE_TEXT') {
     handleTranslationRequest(request, sendResponse)
-    return true // Indicates an asynchronous response
-  }
-})
-
-const handleTranslationRequest = async (
-  request: any,
-  sendResponse: (response: any) => void,
-) => {
-  const { text, targetLanguage } = request
-
-  try {
-    const storageData = await getStorageData()
-    const {
-      status,
-      prompt,
-      selectedProvider,
-      providerConfig,
-      selectedModel,
-      ollamaConfig,
-      openaiConfig,
-    } = storageData
-
-    if (!status) {
-      throw new Error('Translation is currently disabled')
-    }
-
-    if (
-      !isConfigValid(
-        selectedProvider,
-        providerConfig,
-        selectedModel,
-        ollamaConfig,
-        openaiConfig,
-      )
-    ) {
-      throw new Error(
-        'API 配置不完整。请检查 API Key、Base URL 和模型名称是否正确设置。',
-      )
-    }
-
-    const response = await translateText(text, targetLanguage, prompt)
-    console.log('Translation response:', response)
-    sendResponse({ type: 'TRANSLATED_TEXT', translatedText: response })
-  } catch (error: any) {
-    sendResponse({ type: 'TRANSLATION_ERROR', error: error.message })
-  }
-}
-
-const isConfigValid = (
-  selectedProvider: string | undefined,
-  providerConfig: any,
-  selectedModel: string | undefined,
-  ollamaConfig: any,
-  openaiConfig: any,
-): boolean => {
-  if (selectedProvider && providerConfig) {
-    let provider = selectedProvider
-    if (provider === 'openai' || provider === 'zhipu') {
-      provider = 'openai-compatible'
-    }
-
-    if (provider === 'openai-compatible') {
-      return !!(
-        providerConfig?.apiKey &&
-        providerConfig?.baseURL &&
-        providerConfig?.modelName &&
-        providerConfig.apiKey.trim() !== '' &&
-        providerConfig.baseURL.trim() !== '' &&
-        providerConfig.modelName.trim() !== ''
-      )
-    } else if (provider === 'ollama') {
-      return !!(
-        providerConfig?.baseURL &&
-        providerConfig?.modelName &&
-        providerConfig.baseURL.trim() !== '' &&
-        providerConfig.modelName.trim() !== ''
-      )
-    }
+    return true
   }
 
-  if (selectedModel === 'openai') {
-    return !!(
-      openaiConfig?.apiKey &&
-      openaiConfig?.baseURL &&
-      openaiConfig?.modelName &&
-      openaiConfig.apiKey.trim() !== '' &&
-      openaiConfig.baseURL.trim() !== '' &&
-      openaiConfig.modelName.trim() !== ''
-    )
-  } else if (selectedModel === 'ollama') {
-    return !!(
-      ollamaConfig?.baseURL &&
-      ollamaConfig?.modelName &&
-      ollamaConfig.baseURL.trim() !== '' &&
-      ollamaConfig.modelName.trim() !== ''
-    )
+  if (request.type === 'CLEAR_TRANSLATION_CACHE') {
+    setStorageData({ [TRANSLATION_CACHE_KEY]: {} })
+      .then(() => sendResponse({ ok: true }))
+      .catch((error) =>
+        sendResponse({ ok: false, error: String(error?.message || error) }),
+      )
+    return true
   }
 
   return false
+})
+
+const handleTranslationRequest = async (
+  request: TranslateRequest,
+  sendResponse: (response: any) => void,
+) => {
+  const originalText = request.text?.trim()
+
+  if (!originalText) {
+    sendResponse({
+      type: 'TRANSLATED_TEXT',
+      translatedText: '',
+      fallback: true,
+      fromCache: false,
+    })
+    return
+  }
+
+  try {
+    const settings = await getSettings()
+
+    if (!settings.enabled) {
+      sendResponse({
+        type: 'TRANSLATION_SKIPPED',
+        reason: 'disabled',
+      })
+      return
+    }
+
+    const targetLanguage =
+      request.targetLanguage || settings.targetLanguage || 'id'
+    const sourceLanguage =
+      request.sourceLanguage || settings.sourceLanguage || 'auto'
+    const cacheKey = buildCacheKey(
+      originalText,
+      targetLanguage,
+      sourceLanguage,
+    )
+    const stored = await getStorageData<{
+      translationCache?: Record<string, string>
+    }>([TRANSLATION_CACHE_KEY])
+    const translationCache = stored.translationCache || {}
+
+    if (translationCache[cacheKey]) {
+      sendResponse({
+        type: 'TRANSLATED_TEXT',
+        translatedText: translationCache[cacheKey],
+        fallback: false,
+        fromCache: true,
+      })
+      return
+    }
+
+    const result = await translateText(
+      originalText,
+      targetLanguage,
+      sourceLanguage,
+    )
+
+    if (!result.fallback) {
+      await setStorageData({
+        [TRANSLATION_CACHE_KEY]: {
+          ...translationCache,
+          [cacheKey]: result.translatedText,
+        },
+      })
+    }
+
+    sendResponse({
+      type: 'TRANSLATED_TEXT',
+      translatedText: result.translatedText,
+      fallback: result.fallback,
+      fromCache: false,
+    })
+  } catch (error: any) {
+    console.error('Translation request failed:', error)
+    sendResponse({
+      type: 'TRANSLATION_ERROR',
+      error: error?.message || 'Translation failed',
+      translatedText: originalText,
+      fallback: true,
+    })
+  }
 }

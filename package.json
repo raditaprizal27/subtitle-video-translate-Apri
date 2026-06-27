@@ -1,7 +1,18 @@
 {
-  "name": "react-config",
-  "version": "3.0.2",
+  "name": "apri-video-translate",
+  "version": "3.1.0",
+  "description": "A lightweight Chromium extension that translates existing video captions into Indonesian with a bilingual overlay.",
   "private": true,
+  "keywords": [
+    "chrome-extension",
+    "edge-extension",
+    "subtitle",
+    "translation",
+    "indonesian",
+    "youtube",
+    "udemy",
+    "manifest-v3"
+  ],
   "dependencies": {
     "@ant-design/icons": "^5.4.0",
     "antd": "^4.24.16",
@@ -10,21 +21,15 @@
     "global": "^4.4.0",
     "jquery": "^3.6.0",
     "ky": "^0.31.1",
-    "lodash": "^4.17.21",
     "md5": "^2.3.0",
-    "ollama": "^0.5.6",
-    "openai": "^4.55.0",
     "react": "^18.1.0",
-    "react-color": "^2.19.3",
     "react-dom": "^18.1.0",
     "uuid": "^8.3.2"
   },
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js && node scripts/zip.js",
-    "test": "node scripts/test.js",
-    "check-mv3": "node check-mv3-compatibility.js",
-    "test-apis": "node test-openai-api.js"
+    "test": "node scripts/test.js"
   },
   "browserslist": {
     "production": [
@@ -104,11 +109,9 @@
     "@types/chrome": "^0.0.184",
     "@types/jest": "^27.0.1",
     "@types/jquery": "^3.5.14",
-    "@types/lodash": "^4.17.7",
     "@types/md5": "^2.3.2",
     "@types/node": "^16.7.13",
     "@types/react": "^18.0.0",
-    "@types/react-color": "^3.0.6",
     "@types/react-dom": "^18.0.0",
     "@types/uuid": "^8.3.4",
     "@types/webpack-env": "^1.16.4",

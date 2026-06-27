@@ -1,266 +1,110 @@
 <p align="center">
-  <img src="https://github.com/ChenYCL/chrome-extension-udemy-translate/raw/v2.0.0/example/ball-logo.png" alt="Universal Subtitle Translator" height="128" width="128" />
+  <img src="public/icon-128.png" width="96" height="96" alt="Apri Video Translate logo" />
 </p>
 
-<h1 align="center">
-  Universal Subtitle Translator
-</h1>
+<h1 align="center">Apri Video Translate</h1>
 
 <p align="center">
-  <strong>Real-time subtitle translation for any website</strong>
+  A lightweight Chromium extension that translates existing video captions into Indonesian with a clean bilingual overlay.
 </p>
 
 <p align="center">
-  <a href="README_zh.md">
-    <img src="https://img.shields.io/badge/README-中文-yellow.svg" alt="Chinese README">
-  </a>
-  <img src="https://img.shields.io/github/downloads/ChenYCL/chrome-extension-udemy-translate/total" alt="Downloads">
-  <img src="https://img.shields.io/github/package-json/v/ChenYCL/chrome-extension-udemy-translate/main" alt="Version">
-  <a href="https://opensource.org/licenses/mit-license.php">
-    <img src="https://badges.frapsoft.com/os/mit/mit.svg?v=103" alt="MIT License">
-  </a>
+  <img alt="Manifest V3" src="https://img.shields.io/badge/Manifest-V3-1f8fba" />
+  <img alt="Chromium" src="https://img.shields.io/badge/Browser-Chrome%20%7C%20Edge-0f766e" />
+  <img alt="No API key" src="https://img.shields.io/badge/API%20key-not%20required-facc15" />
+  <img alt="Default language" src="https://img.shields.io/badge/Default-Indonesian-e11d48" />
 </p>
 
-## 🌟 About This Extension
+## Why This Exists
 
-A powerful Chrome extension that translates subtitles from any website into different languages in real-time. No longer limited to specific video platforms - supports user-defined subtitle translation for any website with customizable selectors.
+Apri Video Translate is for learners who watch technical videos, courses, talks, and tutorials in another language but want quick Indonesian subtitle help without API keys or paid services.
 
-## 🎬 Demo Videos
+It keeps the experience intentionally simple:
 
-https://github.com/user-attachments/assets/8089f430-894f-4abc-9c86-544739ab0f57
+- Turn it on.
+- Enable captions on the video.
+- Read Indonesian translation first, original subtitle second.
 
-https://github.com/user-attachments/assets/de6300f6-af87-441a-9304-dd58b255a17a
+## Features
 
-![IMG_8903](https://github.com/user-attachments/assets/c0c50090-864f-405d-84f0-3e7ce47e0f3e)
+- Indonesian (`id`) as the default target language.
+- Bilingual subtitle overlay inspired by streaming platforms.
+- YouTube, YouTube embeds, Udemy, and generic HTML5 video support.
+- Works inside supported iframe embeds with `all_frames`.
+- Local translation cache using source language, target language, and original caption text.
+- Debounced caption detection to avoid excessive translation calls.
+- Simple popup controls for enable/disable, target language, bilingual mode, subtitle position, and cache clearing.
+- No login, no backend server, no API key, and no paid API integration.
 
+## Important Limitation
 
-## ✨ Key Features
+This extension only translates subtitles/captions that already exist on the page.
 
-- 🌐 **Universal Support** - Works on any website with subtitles
-- 🤖 **Multiple AI Models** - OpenAI API and local Ollama support
-- 🎯 **Custom Selectors** - Define your own DOM selectors for any site
-- ⚡ **Real-time Translation** - Instant translation without page refresh
-- 🌍 **Multi-language** - Supports translation to any language
-- 🎨 **Customizable UI** - Adjustable subtitle style and position
-- 🔧 **Easy Configuration** - One-click preset configurations
-- 🧪 **Built-in Testing** - Test API configurations directly in options
+It does not generate subtitles from audio and does not include speech-to-text. If a video has no captions, there is nothing for the extension to translate.
 
-## 📦 Installation
+## Supported Sites
 
-### Method 1: Chrome Web Store (Recommended)
+| Site / player | Status | Notes |
+| --- | --- | --- |
+| YouTube | Supported | Requires captions/CC to be available and enabled. |
+| YouTube embeds | Supported | Includes course pages that embed YouTube players. |
+| Udemy | Supported | Requires course captions to be available. |
+| HTML5 video | Best effort | Reads `video.textTracks` and common caption containers. |
 
-_Coming soon - Extension will be available on Chrome Web Store_
+More details: [Supported Sites](docs/SUPPORTED_SITES.md).
 
-### Method 2: Manual Installation
+## How Translation Works
 
-1. **Download the Extension**
+Apri Video Translate uses the unofficial free Google Translate endpoint:
 
-   - Download the latest release from [Releases](https://github.com/ChenYCL/chrome-extension-udemy-translate/releases)
-   - Or clone and build from source
+```text
+https://translate.googleapis.com/translate_a/single
+```
 
-2. **Install in Chrome**
+Requests include only the subtitle text and selected language codes. If the request fails or times out, the extension falls back gracefully and keeps the original subtitle visible.
 
-   - Open Chrome and go to `chrome://extensions/`
-   - Enable "Developer mode" in the top right
-   - Click "Load unpacked" and select the extension folder
+Privacy details: [Privacy](PRIVACY.md).
 
-3. **Configure the Extension**
-   - Right-click the extension icon → Options
-   - Configure your preferred AI model (OpenAI or Ollama)
-   - Add website configurations for subtitle translation
-
-## 🎯 Supported Platforms
-
-- ✅ **Netflix** - Real-time subtitle translation
-- ✅ **YouTube** - Video subtitle support
-- ✅ **Amazon Prime Video** - Streaming subtitles
-- ✅ **Disney+** - Multi-language support
-- ✅ **HBO Max** - Premium content translation
-- ✅ **Hulu** - Live and on-demand content
-- ✅ **Paramount+** - Sports and entertainment
-- ✅ **LinkedIn Learning** - Educational content
-- ✅ **Udemy** - Course subtitles
-- ✅ **Any Website** - Custom selector configuration
-
-## 🚀 Quick Start
-
-### Step 1: Choose Your AI Model
-
-**Option A: OpenAI API (Recommended)**
-
-- High-quality translation
-- Multiple model options
-- Supports third-party compatible APIs
-
-**Option B: Local Ollama**
-
-- Privacy-focused local processing
-- No API costs
-- Requires local setup
-
-### Step 2: Configure API
-
-1. **OpenAI Configuration:**
-
-   - Get API key from [OpenAI Platform](https://platform.openai.com/)
-   - Choose from preset configurations:
-     - OpenAI Official: `https://api.openai.com/v1`
-     - Third-party services: Various compatible APIs
-   - Test configuration with built-in testing tool
-
-2. **Ollama Configuration:**
-   - Install Ollama locally
-   - Set up HTTPS proxy (see [local-https-proxy-ollama](https://github.com/ChenYCL/local-https-proxy-ollama))
-   - Configure local endpoint
-
-### Step 3: Add Website Configuration
-
-1. **Access Options Page**
-
-   - Right-click extension icon → Options
-   - Or click extension icon → Settings
-
-2. **Add Website Configuration**
-
-   - Domain: `https://www.netflix.com`
-   - Selector: `.player-timedtext-text-container` (for Netflix subtitles)
-   - Save configuration
-
-3. **Test Translation**
-   - Visit configured website
-   - Play video with subtitles
-   - Translation should appear automatically
-
-## ⚙️ Configuration Guide
-
-### 🤖 OpenAI API Setup
-
-#### Supported Services
-
-- **OpenAI Official**: `https://api.openai.com/v1`
-- **Third-party Compatible APIs**:
-  - OAIPro: `https://api.oaipro.com/v1`
-  - UseAIHub: `https://api.useaihub.com/v1`
-  - Any OpenAI-compatible service
-
-#### Configuration Steps
-
-1. **Get API Key**
-
-   - Visit [OpenAI Platform](https://platform.openai.com/)
-   - Create account and generate API key
-   - Or use third-party service credentials
-
-2. **Configure Extension**
-   - Select **OpenAI** model
-   - Choose preset configuration or enter custom URL
-   - Enter your API key
-   - Select model (gpt-3.5-turbo, gpt-4, etc.)
-   - Click **🧪 Test API Configuration** to verify
-
-#### Troubleshooting
-
-- **401 Error**: Check API key validity
-- **429 Error**: Rate limit exceeded, check quota
-- **404 Error**: Verify model name and endpoint URL
-
-### 🏠 Ollama Local Setup
-
-#### Prerequisites
-
-- Local Ollama installation
-- HTTPS proxy for Chrome extension compatibility
-- Sufficient system resources (4GB+ RAM recommended)
-
-#### Quick Setup
+## Install From Source
 
 ```bash
-# 1. Install Ollama
-# Visit https://ollama.ai for installation instructions
+npm install
+npm run build
+```
 
-# 2. Download recommended model
-ollama pull qwen2:0.5b  # Lightweight, good for translation
+Then load the unpacked extension:
 
-# 3. Set up HTTPS proxy
-git clone https://github.com/ChenYCL/local-https-proxy-ollama.git
-cd local-https-proxy-ollama
-./setup.sh  # macOS/Linux or setup.bat for Windows
+1. Open `chrome://extensions` in Chrome or `edge://extensions` in Microsoft Edge.
+2. Enable Developer mode.
+3. Choose Load unpacked.
+4. Select the `build/` folder.
+5. Open a video page, enable captions, and turn on Apri Video Translate from the toolbar popup.
 
-# 4. Start proxy server
+## Development
+
+```bash
 npm start
 ```
 
-#### Extension Configuration
+Create a production build and zip:
 
-1. Select **Ollama** model
-2. Set Base URL: `https://localhost:11435/v1`
-3. Set Model Name: `qwen2:0.5b`
-4. API Key: `ollama` (any value works)
+```bash
+npm run build
+```
 
-For detailed setup instructions, see: [local-https-proxy-ollama](https://github.com/ChenYCL/local-https-proxy-ollama)
+The unpacked extension is generated in `build/`, and the zip package is generated in `release/`.
 
-## 🌐 Custom Website Configuration
+## Roadmap
 
-### Adding New Websites
+- More site adapters for Coursera, edX, LinkedIn Learning, Vimeo, and other course platforms.
+- Optional import/export for settings and cache.
+- Better caption diagnostics when a site cannot be detected.
+- More polished release screenshots and demo GIFs.
 
-1. **Find Subtitle Selector**
+## Contributing
 
-   - Open browser developer tools (F12)
-   - Inspect subtitle elements
-   - Copy CSS selector
+Small, focused improvements are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) before opening issues or pull requests.
 
-2. **Add Configuration**
-   - Domain: Full website URL (e.g., `https://www.example.com`)
-   - Selector: CSS selector for subtitle elements
-   - Save and test
+## License
 
-### Common Selectors
-
-- **Netflix**: `.player-timedtext-text-container`
-- **YouTube**: `.ytp-caption-segment`
-- **Amazon Prime**: `.atvwebplayersdk-captions-text`
-- **Disney+**: `.dss-subtitle-renderer-cue`
-
-## 🔧 Advanced Features
-
-- **Custom Translation Prompts**: Modify translation instructions
-- **Subtitle Styling**: Customize appearance and position
-- **Multiple Domains**: Support multiple websites simultaneously
-- **Real-time Testing**: Built-in API configuration testing
-
-## Cooperation Promotion
-
-Contact via WeChat Official Account
-
-## Welcome to Follow the WeChat Official Account
-
-There are related plugin usage tutorials. Follow and reply 'Translation Tool' to get it. Follow and reply '工具下载' to get the latest version. Regular sharing of audiovisual information worth watching.
-
-<img src="https://raw.githubusercontent.com/ChenYCL/chrome-extension-udemy-translate/master/example/qrcode.BMP" alt="" height="148" width="148" />
-
-## Donation Channel ☕️
-
-### Discount
-
-[1watchtv.com](https://1watchtv.com)
-
-[奈飞小铺](https://ihezu.cool/YqDFNq)
-
-### Alipay
-
-<img src="https://github.com/ChenYCL/chrome-extension-udemy-translate/raw/v2.0.0/example/alipay.JPG" alt="" height="148" width="148" />
-
-### WeChat
-
-![image](https://github.com/user-attachments/assets/ace0a879-7f4f-4965-91f4-ca73eeac9776)
-
-
-## Communication
-
-[Telegram Group](https://t.me/joinchat/Gs1RFzD5MpIwJ7S-)
-
-<img src="https://i.loli.net/2021/01/12/Vti5GPdqxjN3ETL.jpg" alt="" height="148" width="148" />
-
-## Code Contribution
-
-Contributions are welcome! Just send a PR for fixes and documentation updates, and open an issue for new features beforehand. Make sure tests pass and coverage remains high. Thank you!
+This project was adapted from an existing public extension repository. Before distributing a public fork widely, confirm the upstream licensing situation and choose the appropriate license for your publication.
